@@ -8,12 +8,31 @@ void echo(int connfd)
 {
     size_t n;
     char buf[MAXLINE];
+    char storage[MAXLINE];
+    int is_storage_filled = 0;
     rio_t rio;
-
     Rio_readinitb(&rio, connfd);
+
     while((n = Rio_readlineb(&rio, buf, MAXLINE)) != 0) { //line:netp:echo:eof
-		printf("server received %d bytes\n", (int)n);
-		Rio_writen(connfd, buf, n);
+        if (strcmp(buf, "ping\n") == 0) {
+            strcpy(buf, "pong\n");
+        } else if (strncmp("PUT ", buf, 4) == 0) {
+            if (is_storage_filled == 1) {
+                strcpy(buf, "VARIABLE FIlLED\n");
+            }
+            strcpy(storage, &buf[4]);
+            strcpy(buf, "OK\n");
+            is_storage_filled = 1;
+        } else if (strncmp("GET", buf, 3) == 0) {
+            if (is_storage_filled == 0) {
+                strcpy(buf, "VARIABLE EMPTY\n");
+            }
+            strcpy(buf, storage);
+            is_storage_filled = 0;
+        } else {
+            strcpy(buf, "BAD REQUEST\n");
+        }
+        Rio_writen(connfd, buf, strlen(buf));
     }
 }
 
