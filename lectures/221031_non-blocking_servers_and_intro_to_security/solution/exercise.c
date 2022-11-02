@@ -41,6 +41,7 @@ void get_signature(char* password, char* salt, hashdata_t* hash)
 
     memcpy(to_hash, password, strlen(password));
     memcpy(to_hash+strlen(password), salt, strlen(salt));
+    
     get_data_sha(to_hash, hash, strlen(to_hash), SHA256_HASH_SIZE);
 
     // TODO Put some code in here so that to_hash contains the password and 
