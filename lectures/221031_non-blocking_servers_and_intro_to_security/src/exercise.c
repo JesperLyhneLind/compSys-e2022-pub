@@ -39,9 +39,12 @@ void get_signature(char* password, char* salt, hashdata_t* hash)
 {
     char to_hash[strlen(password) + strlen(salt)];
 
-
+    strcpy(to_hash, password);
+    strcpy(&to_hash[strlen(password)], salt);
     // TODO Put some code in here so that to_hash contains the password and 
     // salt and is then hashed
+
+    get_data_sha(to_hash, *hash, strlen(to_hash), SHA256_HASH_SIZE);
 
     // You can use this to confirm that you are hashing what you think you are
     // hashing
@@ -52,7 +55,7 @@ void get_signature(char* password, char* salt, hashdata_t* hash)
     printf("\n");
 }
 
-int main(int argc, char **argv)
+int main()
 {
     int PASSWORD_LEN = 16;
 
@@ -73,7 +76,7 @@ int main(int argc, char **argv)
 
     // Register the signature
     hashdata_t signature;
-    get_signature(password, salt, signature);
+    get_signature(password, salt, &signature);
 
     rio_t rio;
     int server_socket = Open_clientfd("0.0.0.0", "12345");
